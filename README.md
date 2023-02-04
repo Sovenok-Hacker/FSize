@@ -10,7 +10,7 @@ sudo make install
 
 # Usage
 ```
-fsize LICENCE # output: 35 KB
+fsize LICENSE # output: 35 KB
 fsize . # output: It is a directory or not found.
 fsize /dev/null # output: It is a directory or not found.
 ```
