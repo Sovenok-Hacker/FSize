@@ -1,9 +1,21 @@
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+int is_file(const char *path) {
+    struct stat path_stat;
+    stat(path, &path_stat);
+    return S_ISREG(path_stat.st_mode);
+}
 
 int main(int argc, char **argv) {
 	FILE* file;
 	if (argc == 1) {
 		printf("Usage: %s [filename]\n", argv[0]);
+		return 1;
+	}
+	if (!is_file(argv[1])) {
+		printf("It is a directory or not found.\n");
 		return 1;
 	}
 	file = fopen(argv[1], "r");
@@ -29,4 +41,5 @@ int main(int argc, char **argv) {
 	else {
 		printf("%ld B\n", size);
 	}
+	return 0;
 }
