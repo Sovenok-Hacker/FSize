@@ -2,44 +2,35 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-int is_file(const char *path) {
-    struct stat path_stat;
-    stat(path, &path_stat);
-    return S_ISREG(path_stat.st_mode);
-}
-
 int main(int argc, char **argv) {
-	FILE* file;
-	if (argc == 1) {
-		printf("Usage: %s [filename]\n", argv[0]);
-		return 1;
-	}
-	if (!is_file(argv[1])) {
-		printf("It is a directory or not found.\n");
-		return 1;
-	}
-	file = fopen(argv[1], "r");
-	if (file == NULL) {
-		printf("Can`t read file.\n");
-		return 1;
-	}
-	fseek(file, 0L, SEEK_END);
-	long int size = ftell(file);
-	fclose(file);
-	if (size>1000000000000) {
-		printf("%ld TB\n", size / 1000000000000);
-	}
-	else if (size>1000000000) {
-		printf("%ld GB\n", size / 1000000000);
-	}
-	else if (size>1000000) {
-		printf("%ld MB\n", size / 1000000);
-	}
-	else if (size>1000) {
-		printf("%ld KB\n", size / 1000);
-	}
-	else {
-		printf("%ld B\n", size);
-	}
-	return 0;
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s [filename]\n", argv[0]);
+        return 1;
+    }
+    struct stat st;
+    if (stat(argv[1], &st) != 0) {
+        perror("Error in stat");
+        return 1;
+    }
+    if (!S_ISREG(st.st_mode)) {
+        fprintf(stderr, "%s is not a regular file or does not exist.\n", argv[1]);
+        return 1;
+    }
+    long int size = st.st_size;
+    char* suffix = "B";
+    if (size >= 1000000000000) {
+        size /= 1000000000000;
+        suffix = "TB";
+    } else if (size >= 1000000000) {
+        size /= 1000000000;
+        suffix = "GB";
+    } else if (size >= 1000000) {
+        size /= 1000000;
+        suffix = "MB";
+    } else if (size >= 1000) {
+        size /= 1000;
+        suffix = "KB";
+    }
+    printf("%ld %s\n", size, suffix);
+    return 0;
 }
